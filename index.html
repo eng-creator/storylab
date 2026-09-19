@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visual Story Lab — Stories Without Words</title>
+<meta name="description" content="An interactive Grade 5 pilot research website exploring how pictures and emojis support story comprehension.">
+<style>
+  :root{
+    --ink:#1f2937;
+    --muted:#667085;
+    --paper:#f8fafc;
+    --card:#ffffff;
+    --line:#e5e7eb;
+    --accent:#5b5bd6;
+    --accent-2:#8b5cf6;
+    --soft:#eef2ff;
+    --success:#147d4b;
+    --warning:#9a6700;
+    --danger:#b42318;
+    --shadow:0 14px 40px rgba(30,41,59,.08);
+    --radius:22px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:linear-gradient(180deg,#f7f8ff 0,#fbfdff 34%,#f8fafc 100%);line-height:1.55}
+  a{color:inherit}
+  button,input,select{font:inherit}
+  button{cursor:pointer}
+  .site-shell{min-height:100vh}
+  .topbar{position:sticky;top:0;z-index:1000;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-bottom:1px solid rgba(229,231,235,.92)}
+  .nav{max-width:1180px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:13px 20px}
+  .brand{display:flex;align-items:center;gap:11px;text-decoration:none;min-width:210px}
+  .brand-mark{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;font-weight:800;box-shadow:0 8px 18px rgba(91,91,214,.25)}
+  .brand-text strong{display:block;font-size:15px;letter-spacing:.03em}.brand-text span{display:block;color:var(--muted);font-size:11px}
+  .nav-links{display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.nav-links button{border:0;background:transparent;color:#475467;padding:9px 10px;border-radius:10px}.nav-links button:hover,.nav-links button.active{background:var(--soft);color:var(--accent);font-weight:650}
+  .mobile-menu{display:none;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px}
+  main{max-width:1180px;margin:0 auto;padding:0 20px 70px}
+  .page{display:none;animation:fade .25s ease}.page.active{display:block}@keyframes fade{from{opacity:.55;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .hero{padding:68px 0 42px;display:grid;grid-template-columns:1.12fr .88fr;gap:34px;align-items:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--soft);color:var(--accent);padding:7px 11px;border-radius:999px;font-size:12px;font-weight:750;letter-spacing:.04em;text-transform:uppercase}
+  h1{font-size:clamp(38px,6vw,70px);line-height:.98;letter-spacing:-.055em;margin:16px 0 18px}.hero h1 span{color:var(--accent)}
+  .lead{font-size:18px;color:#4b5565;max-width:680px}
+  .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:25px}.primary,.secondary,.ghost,.danger{border:0;border-radius:13px;padding:12px 17px;font-weight:700}.primary{background:var(--accent);color:#fff;box-shadow:0 10px 22px rgba(91,91,214,.18)}.secondary{background:#111827;color:#fff}.ghost{background:#fff;border:1px solid var(--line);color:#374151}.danger{background:#fff1f0;color:var(--danger);border:1px solid #f7c7c1}
+  .hero-card{background:#fff;border:1px solid var(--line);border-radius:30px;box-shadow:var(--shadow);padding:24px;position:relative;overflow:hidden}.hero-card:before{content:"";position:absolute;inset:auto -40px -60px -40px;height:170px;background:radial-gradient(circle at 40% 20%,rgba(139,92,246,.18),transparent 58%)}
+  .visual-window{border:1px solid #e6e8f2;border-radius:22px;background:#f7f8ff;padding:17px}.visual-window h3{margin:0 0 10px;font-size:16px}.mini-story{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.mini-story .mini{height:92px;border-radius:16px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-size:33px}.hero-stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.hero-stat div{background:#fff;border:1px solid var(--line);border-radius:15px;padding:10px;text-align:center}.hero-stat strong{display:block;font-size:20px}.hero-stat span{font-size:11px;color:var(--muted)}
+  .section{padding:42px 0}.section-head{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:20px}.section-head h2{margin:0;font-size:32px;letter-spacing:-.03em}.section-head p{margin:0;color:var(--muted);max-width:700px}.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 8px 25px rgba(15,23,42,.045);padding:20px}.card h3{margin:0 0 7px}.card p{margin:0;color:#667085}.icon{font-size:30px;margin-bottom:9px}.tag{display:inline-block;font-size:11px;font-weight:800;padding:5px 8px;border-radius:999px;background:#f3f4f6;color:#475467}
+  .info-band{background:#111827;color:#fff;border-radius:26px;padding:26px 28px;display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:center}.info-band p{color:#d1d5db;margin:6px 0 0}.metric-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.metric{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);padding:12px 15px;border-radius:15px;text-align:center;min-width:100px}.metric strong{display:block;font-size:20px}.metric span{font-size:11px;color:#d1d5db}
+  .content{padding:38px 0}.content > .card{margin-bottom:18px}.content h2{font-size:34px;margin:0 0 9px;letter-spacing:-.035em}.content h3{font-size:20px}.prose p{color:#4b5563}.prose ul{color:#4b5563}
+  .callout{padding:15px 16px;background:#f5f7ff;border-left:4px solid var(--accent);border-radius:10px;margin:16px 0;color:#475467}.callout strong{color:#1f2937}
+  .research-box{background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px}.research-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.small-muted{font-size:12px;color:var(--muted)}
+  .form-row{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}.field input,.field select{width:100%;border:1px solid #dbe0e7;border-radius:12px;padding:11px 12px;background:#fff;outline:none}.field input:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(91,91,214,.11)}
+  .test-shell{max-width:900px;margin:0 auto}.progress-wrap{margin:18px 0}.progress-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:7px}.progress{height:9px;background:#e9edf5;border-radius:999px;overflow:hidden}.progress > span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:999px;transition:width .25s ease}
+  .question-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:var(--shadow)}.q-kicker{font-size:12px;color:var(--accent);font-weight:800;text-transform:uppercase;letter-spacing:.06em}.question-card h3{font-size:23px;margin:9px 0 17px}.question-support{padding:14px 16px;background:#f8fafc;border-radius:15px;border:1px solid var(--line);margin-bottom:16px;color:#374151}.options{display:grid;gap:10px}.option{border:1px solid #dfe4eb;background:#fff;border-radius:14px;padding:13px 15px;text-align:left;display:flex;align-items:center;gap:10px}.option:hover{border-color:#b8bce8;background:#fafaff}.option.selected{border-color:var(--accent);background:#f5f5ff;box-shadow:0 0 0 2px rgba(91,91,214,.08)}.option.correct{border-color:#77b894;background:#effbf4}.option.incorrect{border-color:#eaa39e;background:#fff5f4}.choice-dot{width:26px;height:26px;border-radius:50%;border:1px solid #cbd5e1;display:grid;place-items:center;font-size:12px;font-weight:800;flex:0 0 auto}.selected .choice-dot{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .q-actions{display:flex;justify-content:space-between;gap:10px;margin-top:18px}.q-actions .right{display:flex;gap:8px}
+  .story-layout{display:grid;grid-template-columns:.88fr 1.12fr;gap:18px}.story-text{font-size:17px;line-height:1.75;color:#374151}.story-text p{margin:0 0 12px}.story-meta{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+  .picture-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.scene{background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden}.scene svg{display:block;width:100%;height:auto;background:#eef5ff}.scene .scene-caption{padding:10px 12px;font-size:12px;color:var(--muted);display:none}
+  .emoji-story{display:grid;gap:14px}.emoji-line{font-size:48px;letter-spacing:7px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px 18px;display:flex;align-items:center;min-height:88px}.emoji-step{display:flex;gap:11px;align-items:center}.emoji-num{width:32px;height:32px;border-radius:10px;background:#f0f1fb;display:grid;place-items:center;font-weight:800;color:var(--accent);font-size:13px}
+  .quiz-list{display:grid;gap:12px}.quiz-item{padding:15px;border:1px solid var(--line);border-radius:16px;background:#fff}.quiz-item p{margin:0 0 9px;font-weight:700}.mini-options{display:flex;gap:8px;flex-wrap:wrap}.mini-options button{border:1px solid #dce1e9;background:#fff;border-radius:10px;padding:8px 11px}.mini-options button.selected{background:var(--soft);border-color:#c5c8f3;color:var(--accent);font-weight:700}
+  .builder{display:grid;grid-template-columns:1fr 1fr;gap:18px}.builder .preview{min-height:280px;background:linear-gradient(160deg,#f7f8ff,#fff);border:1px dashed #cdd3e2;border-radius:20px;padding:22px}.story-output{font-size:18px;line-height:1.7}.story-output strong{color:var(--accent)}
+  .dashboard-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.dash-stat{padding:18px;background:#fff;border:1px solid var(--line);border-radius:18px}.dash-stat .num{font-size:30px;font-weight:800}.dash-stat .lab{font-size:12px;color:var(--muted)}.bar-chart{display:grid;gap:11px}.bar-row{display:grid;grid-template-columns:130px 1fr 60px;gap:10px;align-items:center}.bar-bg{height:14px;background:#edf0f5;border-radius:999px;overflow:hidden}.bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:999px}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:16px}.data-table{width:100%;border-collapse:collapse;min-width:710px}.data-table th,.data-table td{padding:11px 12px;border-bottom:1px solid #eef0f4;text-align:left;font-size:13px}.data-table th{background:#fafbfc}
+  .game-board{display:grid;gap:14px}.order-zone{display:flex;gap:10px;flex-wrap:wrap;min-height:76px;border:2px dashed #d6dae5;padding:12px;border-radius:16px;background:#fafbff}.drag-card{padding:12px 14px;background:#fff;border:1px solid var(--line);border-radius:14px;cursor:pointer;box-shadow:0 3px 9px rgba(15,23,42,.04)}.drag-card.selected{border-color:var(--accent);background:var(--soft)}
+  .footer{border-top:1px solid var(--line);padding:28px 20px 40px;color:var(--muted);text-align:center;font-size:12px}
+  .notice{padding:13px 15px;border-radius:12px;background:#fffbeb;border:1px solid #f0dd9b;color:#6b5500;font-size:13px}
+  .online-status{display:inline-flex;align-items:center;gap:8px;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:750;background:#f3f4f6;color:#475467}
+  .online-status .dot{width:8px;height:8px;border-radius:50%;background:#98a2b3}
+  .online-status.ok{background:#ecfdf3;color:#067647}.online-status.ok .dot{background:#12b76a}
+  .online-status.busy{background:#fffaeb;color:#b54708}.online-status.busy .dot{background:#f79009}
+  .online-status.off{background:#fff1f0;color:#b42318}.online-status.off .dot{background:#f04438}
+  .dashboard-wide{margin-top:18px}
+  .scroll-card{max-height:620px;overflow:auto}
+  .result-hero{display:grid;grid-template-columns:.75fr 1.25fr;gap:18px;align-items:stretch}.score-card{background:#111827;color:#fff;border-radius:24px;padding:24px;display:flex;align-items:center;justify-content:center;text-align:center}.big-score{font-size:64px;font-weight:900;line-height:1}.score-caption{color:#cbd5e1}.score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.score-mini{background:#fff;border:1px solid var(--line);border-radius:18px;padding:15px}.score-mini strong{display:block;font-size:28px}.score-mini span{font-size:12px;color:var(--muted)}
+  .check{color:var(--success);font-weight:700}.muted{color:var(--muted)}
+  @media(max-width:900px){.hero,.info-band,.story-layout,.builder,.result-hero{grid-template-columns:1fr}.grid-3,.dashboard-grid{grid-template-columns:1fr}.grid-2,.research-grid{grid-template-columns:1fr}.nav-links{display:none}.mobile-menu{display:block}.nav.open .nav-links{display:flex;position:absolute;left:15px;right:15px;top:68px;background:#fff;border:1px solid var(--line);padding:10px;border-radius:15px;box-shadow:var(--shadow)}.brand{min-width:0}.hero{padding-top:40px}}
+  @media(max-width:600px){main{padding:0 14px 50px}.form-row,.picture-grid{grid-template-columns:1fr}.hero h1{font-size:43px}.score-grid{grid-template-columns:1fr}.bar-row{grid-template-columns:96px 1fr 50px}.nav{padding:11px 14px}}
+</style>
+</head>
+<body>
+<div class="site-shell">
+<header class="topbar">
+  <nav class="nav" id="nav">
+    <a class="brand" href="#" onclick="showPage('home');return false;">
+      <div class="brand-mark">VS</div>
+      <div class="brand-text"><strong>VISUAL STORY LAB</strong><span>Stories Without Words</span></div>
+    </a>
+    <button class="mobile-menu" onclick="document.getElementById('nav').classList.toggle('open')">Menu</button>
+    <div class="nav-links" id="navLinks">
+      <button data-page="home" onclick="showPage('home')">Home</button>
+      <button data-page="about" onclick="showPage('about')">About</button>
+      <button data-page="pilot" onclick="showPage('pilot')">Take Pilot</button>
+      <button data-page="stories" onclick="showPage('stories')">Stories</button>
+      <button data-page="decoder" onclick="showPage('decoder')">Story Decoder</button>
+      <button data-page="create" onclick="showPage('create')">Create</button>
+      <button data-page="games" onclick="showPage('games')">Games</button>
+      <button data-page="learn" onclick="showPage('learn')">Learn</button>
+      <button data-page="research" onclick="showPage('research')">Research</button>
+      <button data-page="results" onclick="showPage('results')">Results</button>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="page active" id="page-home">
+    <div class="hero">
+      <div>
+        <span class="eyebrow">Grade 5 • Pilot Research • Digital Product</span>
+        <h1>Can a story speak <span>without words?</span></h1>
+        <p class="lead">Welcome to Visual Story Lab — an interactive learning website exploring how children understand stories through text, pictures, and emojis.</p>
+        <div class="hero-actions">
+          <button class="primary" onclick="showPage('pilot')">Start the Pilot</button>
+          <button class="ghost" onclick="showPage('stories')">Explore the Stories</button>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="visual-window">
+          <h3>One idea. Three formats.</h3>
+          <div class="mini-story"><div class="mini">📖</div><div class="mini">🖼️</div><div class="mini">🙂</div></div>
+          <div class="hero-stat"><div><strong>30</strong><span>research questions</span></div><div><strong>5</strong><span>reflection tasks</span></div><div><strong>3</strong><span>story formats</span></div></div>
+        </div>
+        <div class="callout" style="margin-bottom:0"><strong>Pilot goal:</strong> compare actual comprehension, not just opinions.</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="grid-3">
+        <div class="card"><div class="icon">📖</div><h3>Text Story</h3><p>Read a short story in traditional written form and answer 10 questions.</p></div>
+        <div class="card"><div class="icon">🖼️</div><h3>Picture Story</h3><p>Understand a sequence of visual scenes and answer 10 questions without captions.</p></div>
+        <div class="card"><div class="icon">🙂</div><h3>Emoji Story</h3><p>Decode a story told through emojis and answer 10 questions.</p></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="info-band">
+        <div><strong style="font-size:20px">A research tool that becomes a learning platform.</strong><p>The pilot sends participant scores to a shared online research spreadsheet. The final website also includes games, story creation, learning tips, and a teacher dashboard.</p></div>
+        <div class="metric-row"><div class="metric"><strong>35</strong><span>tasks</span></div><div class="metric"><strong>20–30</strong><span>pilot target</span></div><div class="metric"><strong>0</strong><span>names needed</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-about">
+    <div class="content prose">
+      <div class="card"><span class="tag">About the project</span><h2>Research idea</h2><p>This Grade 5 pilot study explores whether pictures and emojis help children understand the main events, characters, actions, emotions, and sequence of short stories.</p><div class="callout"><strong>Main research question:</strong> Can Grade 5 students understand a story using pictures and emojis?</div></div>
+      <div class="grid-2">
+        <div class="card"><h3>Aim</h3><p>To investigate how well Grade 5 students understand short stories presented in different visual and textual formats.</p></div>
+        <div class="card"><h3>Hypothesis</h3><p>Pictures and emojis can help children understand key events and emotions, but some details may be harder to understand without written language.</p></div>
+      </div>
+      <div class="card"><h3>Objectives</h3><ul><li>Explore visual storytelling through words, pictures, and emojis.</li><li>Compare student comprehension across three formats.</li><li>Identify which information is easiest or hardest to understand.</li><li>Collect and analyse pilot data.</li><li>Develop an interactive educational website based on the findings.</li></ul></div>
+      <div class="card"><h3>Research methods</h3><div class="grid-3"><div><strong>1. Review</strong><p>Explore basic ideas about visual communication and story comprehension.</p></div><div><strong>2. Pilot experiment</strong><p>Students complete 30 comprehension tasks across three formats.</p></div><div><strong>3. Reflection</strong><p>Students answer 5 questions about difficulty and preference.</p></div></div><div class="callout"><strong>Analysis:</strong> scores are converted into counts and percentages; format and category performance can then be compared.</div></div>
+    </div>
+  </section>
+
+  <section class="page" id="page-pilot">
+    <div class="content test-shell">
+      <div class="card" id="pilot-intro">
+        <span class="tag">Pilot research</span><h2>Before you start</h2>
+        <p class="muted">Please use a participant code instead of a real name. For example: <strong>S05</strong>. The code is only used to identify the pilot entry in the shared research spreadsheet.</p>
+        <div class="form-row" style="margin-top:16px"><div class="field"><label for="participantCode">Participant code</label><input id="participantCode" maxlength="20" placeholder="e.g. S05" autocomplete="off"></div><div class="field"><label for="gradeSelect">Grade</label><select id="gradeSelect"><option value="5" selected>Grade 5</option><option value="4">Grade 4</option><option value="6">Grade 6</option></select></div></div>
+        <div class="notice" style="margin-top:15px">Research note: after the test is finished, the result is submitted to the project's shared online research spreadsheet. A small local cache is kept only to show the participant's latest result on the same device.</div>
+        <div class="hero-actions"><button class="primary" onclick="startPilot()">Begin Research Test</button></div>
+      </div>
+      <div id="pilot-question-area" style="display:none"></div>
+      <div id="pilot-results-area" style="display:none"></div>
+    </div>
+  </section>
+
+  <section class="page" id="page-stories">
+    <div class="content">
+      <div class="card"><span class="tag">Explore</span><h2>Three stories, three ways to communicate</h2><p class="muted">These stories are for learning and practice. The pilot test uses parallel stories with the same structure and difficulty.</p></div>
+      <div class="story-layout">
+        <div class="card"><span class="tag">Text story</span><h3>The Missing Library Book</h3><div class="story-meta"><span class="tag">Grade 5</span><span class="tag">Text only</span></div><div class="story-text"><p>Mira borrowed a blue adventure book from the school library on Monday.</p><p>She put the book in her backpack and went to art class.</p><p>After school, she walked home. At home, she opened her backpack, but the book was not there.</p><p>Mira checked her bedroom desk and then looked in the kitchen. She still could not find it.</p><p>Then she remembered that she had read the last two pages while sitting on a bench near the school garden.</p><p>The next morning, Mira returned to school and checked the bench. The blue book was under it.</p><p>She took the book back to the library. The librarian thanked her, and Mira felt relieved.</p></div></div>
+        <div class="card"><span class="tag">Picture story</span><h3>Rainy-Day Rescue</h3><div class="picture-grid">
+          <div class="scene"><svg viewBox="0 0 420 240" role="img" aria-label="A child sees a small cat outside while rain begins."><rect width="420" height="240" fill="#cfe2ff"/><rect y="175" width="420" height="65" fill="#a8c68c"/><g fill="#777"><ellipse cx="100" cy="55" rx="55" ry="27"/><ellipse cx="155" cy="48" rx="70" ry="32"/></g><g stroke="#6da0cf" stroke-width="4"><line x1="60" y1="80" x2="50" y2="120"/><line x1="110" y1="80" x2="100" y2="120"/><line x1="160" y1="80" x2="150" y2="120"/></g><circle cx="290" cy="125" r="25" fill="#f3c8a8"/><rect x="269" y="148" width="42" height="58" rx="14" fill="#e58b7b"/><rect x="278" y="201" width="10" height="28" fill="#303846"/><rect x="302" y="201" width="10" height="28" fill="#303846"/><path d="M322 176 Q355 160 377 182" stroke="#5b5b5b" stroke-width="5" fill="none"/><ellipse cx="120" cy="194" rx="23" ry="13" fill="#c79a78"/><circle cx="105" cy="185" r="9" fill="#c79a78"/><circle cx="101" cy="183" r="2" fill="#222"/><circle cx="110" cy="183" r="2" fill="#222"/></svg></div>
+          <div class="scene"><svg viewBox="0 0 420 240" role="img" aria-label="A child opens an umbrella and approaches a small cat."><rect width="420" height="240" fill="#d7e7fb"/><rect y="175" width="420" height="65" fill="#a8c68c"/><circle cx="95" cy="175" r="55" fill="#7bbf7a"/><path d="M50 148 Q95 102 140 148" fill="#95c982"/><circle cx="285" cy="125" r="25" fill="#f3c8a8"/><rect x="264" y="148" width="42" height="58" rx="14" fill="#e58b7b"/><rect x="271" y="201" width="10" height="28" fill="#303846"/><rect x="295" y="201" width="10" height="28" fill="#303846"/><path d="M260 121 Q285 76 320 121 Z" fill="#6a73c9"/><line x1="290" y1="121" x2="290" y2="176" stroke="#4b5563" stroke-width="4"/><ellipse cx="120" cy="194" rx="23" ry="13" fill="#c79a78"/><circle cx="105" cy="185" r="9" fill="#c79a78"/><circle cx="101" cy="183" r="2" fill="#222"/><circle cx="110" cy="183" r="2" fill="#222"/></svg></div>
+          <div class="scene"><svg viewBox="0 0 420 240" role="img" aria-label="The child brings a cardboard box toward the cat."><rect width="420" height="240" fill="#d7e7fb"/><rect y="175" width="420" height="65" fill="#a8c68c"/><circle cx="95" cy="175" r="55" fill="#7bbf7a"/><circle cx="285" cy="115" r="25" fill="#f3c8a8"/><rect x="264" y="138" width="42" height="58" rx="14" fill="#e58b7b"/><rect x="272" y="191" width="10" height="28" fill="#303846"/><rect x="296" y="191" width="10" height="28" fill="#303846"/><rect x="140" y="164" width="85" height="52" fill="#c89c67" stroke="#915f2e" stroke-width="4"/><ellipse cx="120" cy="194" rx="23" ry="13" fill="#c79a78"/><circle cx="105" cy="185" r="9" fill="#c79a78"/><circle cx="101" cy="183" r="2" fill="#222"/><circle cx="110" cy="183" r="2" fill="#222"/></svg></div>
+          <div class="scene"><svg viewBox="0 0 420 240" role="img" aria-label="The cat is safe inside the box under the umbrella."><rect width="420" height="240" fill="#d7e7fb"/><rect y="175" width="420" height="65" fill="#a8c68c"/><path d="M235 120 Q280 72 325 120 Z" fill="#6a73c9"/><line x1="280" y1="120" x2="280" y2="184" stroke="#4b5563" stroke-width="4"/><rect x="155" y="166" width="150" height="68" fill="#c89c67" stroke="#915f2e" stroke-width="4"/><ellipse cx="230" cy="186" rx="27" ry="16" fill="#c79a78"/><circle cx="214" cy="178" r="9" fill="#c79a78"/><circle cx="211" cy="176" r="2" fill="#222"/><circle cx="220" cy="176" r="2" fill="#222"/><circle cx="281" cy="177" r="7" fill="#fff"/></svg></div>
+          <div class="scene"><svg viewBox="0 0 420 240" role="img" aria-label="The child carries the safe cat home under an umbrella."><rect width="420" height="240" fill="#d7e7fb"/><rect y="175" width="420" height="65" fill="#b9cfaf"/><rect x="70" y="118" width="95" height="80" fill="#e7c89a" stroke="#9d7a48" stroke-width="4"/><polygon points="58,118 118,72 178,118" fill="#bb6f6f"/><rect x="108" y="153" width="22" height="45" fill="#896d57"/><circle cx="250" cy="126" r="25" fill="#f3c8a8"/><rect x="229" y="149" width="42" height="56" rx="14" fill="#e58b7b"/><rect x="236" y="201" width="10" height="28" fill="#303846"/><rect x="259" y="201" width="10" height="28" fill="#303846"/><path d="M224 122 Q249 77 284 122 Z" fill="#6a73c9"/><line x1="254" y1="122" x2="254" y2="176" stroke="#4b5563" stroke-width="4"/><rect x="210" y="169" width="50" height="38" fill="#c89c67" stroke="#915f2e" stroke-width="4"/><ellipse cx="236" cy="178" rx="14" ry="9" fill="#c79a78"/></svg></div>
+          <div class="scene"><svg viewBox="0 0 420 240" role="img" aria-label="At home, the dry cat eats from a bowl and the child smiles."><rect width="420" height="240" fill="#f7e9d3"/><rect y="200" width="420" height="40" fill="#d9c1a4"/><rect x="50" y="42" width="95" height="88" fill="#d7e7fb" stroke="#8da4bf" stroke-width="4"/><rect x="275" y="103" width="60" height="30" rx="10" fill="#f2a55e"/><circle cx="175" cy="115" r="25" fill="#f3c8a8"/><rect x="154" y="138" width="42" height="61" rx="14" fill="#e58b7b"/><ellipse cx="270" cy="181" rx="31" ry="17" fill="#c79a78"/><circle cx="247" cy="172" r="10" fill="#c79a78"/><circle cx="244" cy="170" r="2" fill="#222"/><circle cx="251" cy="170" r="2" fill="#222"/><ellipse cx="272" cy="203" rx="24" ry="7" fill="#8b6f58"/></svg></div>
+        </div></div>
+      </div>
+      <div class="card" style="margin-top:18px"><span class="tag">Emoji story</span><h3>The Lost Football</h3><div class="emoji-story"><div class="emoji-step"><div class="emoji-num">1</div><div class="emoji-line">🧒 ⚽ 🌳</div></div><div class="emoji-step"><div class="emoji-num">2</div><div class="emoji-line">🧒 ⚽ 🏃</div></div><div class="emoji-step"><div class="emoji-num">3</div><div class="emoji-line">⚽ ➡️ 🌿</div></div><div class="emoji-step"><div class="emoji-num">4</div><div class="emoji-line">🧒 😟</div></div><div class="emoji-step"><div class="emoji-num">5</div><div class="emoji-line">🧑‍🤝‍🧑 🔎 🌿</div></div><div class="emoji-step"><div class="emoji-num">6</div><div class="emoji-line">👬 🪑 👀</div></div><div class="emoji-step"><div class="emoji-num">7</div><div class="emoji-line">⚽ ✅</div></div><div class="emoji-step"><div class="emoji-num">8</div><div class="emoji-line">🧒 😊</div></div><div class="emoji-step"><div class="emoji-num">9</div><div class="emoji-line">👬 ⚽</div></div><div class="emoji-step"><div class="emoji-num">10</div><div class="emoji-line">🌳 🌇 👋</div></div></div></div>
+    </div>
+  </section>
+
+  <section class="page" id="page-decoder">
+    <div class="content">
+      <div class="card"><span class="tag">Interactive practice</span><h2>Story Decoder</h2><p class="muted">Choose the sentence that best explains each visual sequence.</p></div>
+      <div id="decoderQuiz" class="quiz-list"></div>
+      <div class="card" style="margin-top:16px"><button class="primary" onclick="checkDecoder()">Check Decoder</button><span id="decoderResult" style="margin-left:12px;font-weight:700"></span></div>
+    </div>
+  </section>
+
+  <section class="page" id="page-create">
+    <div class="content">
+      <div class="card"><span class="tag">Creative tool</span><h2>Create Your Story</h2><p class="muted">Build a short story by choosing a character, place, problem, and ending. This section is part of the final educational product, not the scored pilot.</p></div>
+      <div class="builder">
+        <div class="card">
+          <div class="field"><label for="cCharacter">Character</label><select id="cCharacter"><option>A curious student</option><option>A friendly puppy</option><option>A young explorer</option><option>Two best friends</option></select></div>
+          <div class="field" style="margin-top:13px"><label for="cPlace">Place</label><select id="cPlace"><option>at a school garden</option><option>in a quiet park</option><option>near a library</option><option>on a rainy street</option></select></div>
+          <div class="field" style="margin-top:13px"><label for="cProblem">Problem</label><select id="cProblem"><option>finds a lost object</option><option>gets caught in the rain</option><option>hears a strange sound</option><option>cannot find a friend</option></select></div>
+          <div class="field" style="margin-top:13px"><label for="cEnding">Ending</label><select id="cEnding"><option>asks for help and solves the problem</option><option>discovers a surprising clue</option><option>finds a kind solution</option><option>goes home with a smile</option></select></div>
+          <button class="primary" style="margin-top:16px" onclick="buildStory()">Create My Story</button>
+        </div>
+        <div class="preview"><span class="tag">Preview</span><div id="storyOutput" class="story-output" style="margin-top:14px">Choose the story ingredients and click <strong>Create My Story</strong>.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-games">
+    <div class="content">
+      <div class="card"><span class="tag">Mini games</span><h2>Story Games</h2><p class="muted">Practice visual storytelling after the pilot.</p></div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>1. Put the story in order</h3><p class="small-muted">Click cards in the correct order. The correct story is: Find a problem → feel worried → ask for help → solve the problem.</p>
+          <div class="game-board" style="margin-top:13px"><div id="orderOptions" class="order-zone"></div><button class="primary" onclick="checkOrderGame()">Check Order</button><div id="orderResult" style="font-weight:700"></div></div>
+        </div>
+        <div class="card">
+          <h3>2. Match the emotion</h3><p class="small-muted">Choose the emotion that best matches the event.</p>
+          <div class="quiz-list" style="margin-top:13px">
+            <div class="quiz-item"><p>A child loses a favourite book.</p><div class="mini-options" data-game="emotion1"><button data-value="happy">Happy</button><button data-value="worried">Worried</button><button data-value="sleepy">Sleepy</button></div></div>
+            <div class="quiz-item"><p>The child finds the book again.</p><div class="mini-options" data-game="emotion2"><button data-value="angry">Angry</button><button data-value="relieved">Relieved</button><button data-value="confused">Confused</button></div></div>
+          </div>
+          <button class="primary" onclick="checkEmotionGame()">Check</button><span id="emotionResult" style="margin-left:12px;font-weight:700"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-learn">
+    <div class="content prose">
+      <div class="card"><span class="tag">Learn</span><h2>How do visual stories work?</h2><p>Pictures and emojis can communicate parts of a story, but they do not always communicate every detail in the same way that sentences do.</p></div>
+      <div class="grid-3">
+        <div class="card"><div class="icon">👤</div><h3>Characters</h3><p>Look for people, animals, or objects that act in the story.</p></div>
+        <div class="card"><div class="icon">📍</div><h3>Setting</h3><p>Notice where the story happens. A place can be shown through visual clues.</p></div>
+        <div class="card"><div class="icon">➡️</div><h3>Actions</h3><p>Look at movement, changes, and the order of events.</p></div>
+        <div class="card"><div class="icon">❤️</div><h3>Emotions</h3><p>Faces, body language, colours, and symbols may suggest how a character feels.</p></div>
+        <div class="card"><div class="icon">🧩</div><h3>Sequence</h3><p>Put events in order: first, next, then, and finally.</p></div>
+        <div class="card"><div class="icon">💭</div><h3>Inference</h3><p>Ask: “What can I understand even when it is not directly written?”</p></div>
+      </div>
+      <div class="card"><h3>Important tip</h3><div class="callout"><strong>Do not guess only from one clue.</strong> Use several clues together: character + setting + action + emotion + sequence.</div></div>
+    </div>
+  </section>
+
+  <section class="page" id="page-research">
+    <div class="content prose">
+      <div class="card"><span class="tag">Scientific section</span><h2>Research Dashboard</h2><p class="muted">This dashboard reads pilot results from the project's shared Google Sheet. No names are required; participant codes are enough.</p><div class="hero-actions"><button class="primary" onclick="refreshDashboard()">Refresh Online Data</button><button class="ghost" onclick="exportCSV()">Export CSV</button><button class="danger" onclick="clearLocalCache()">Clear Local Cache</button></div>
+<div id="cloudStatus" class="online-status busy"><span class="dot"></span><span>Connecting to shared database…</span></div></div>
+      <div class="dashboard-grid" id="dashboardStats"></div>
+      <div class="grid-2" style="margin-top:18px"><div class="card"><h3>Average score by format</h3><div id="formatChart" class="bar-chart"></div></div><div class="card"><h3>Average score by question category</h3><div id="categoryChart" class="bar-chart"></div></div></div>
+      <div class="card" style="margin-top:18px"><h3>Pilot entries</h3><div class="table-wrap"><table class="data-table" id="resultsTable"><thead><tr><th>Code</th><th>Grade</th><th>Date</th><th>Text / 10</th><th>Pictures / 10</th><th>Emojis / 10</th><th>Total / 30</th><th>%</th></tr></thead><tbody></tbody></table></div></div>
+<div class="grid-2 dashboard-wide">
+  <div class="card scroll-card"><h3>Question-by-question accuracy</h3><div id="questionChart" class="bar-chart"></div></div>
+  <div class="card scroll-card"><h3>Reflection results</h3><div id="reflectionChart" class="quiz-list"></div></div>
+</div>
+      <div class="notice" style="margin-top:16px">For a formal school project, use the online dashboard as the shared pilot record and report the real participant count and results. Do not invent or alter pilot results.</div>
+    </div>
+  </section>
+
+  <section class="page" id="page-results">
+    <div class="content">
+      <div class="card"><span class="tag">Participant results</span><h2>Your latest pilot result</h2><p class="muted">This page shows the most recently completed participant test on this browser.</p></div>
+      <div id="latestResult" class="result-hero"></div>
+      <div class="card" style="margin-top:18px"><h3>What does the score mean?</h3><p class="muted">This is a pilot score for the three story formats. A higher score means more comprehension questions were answered correctly. The result alone does not prove that one format is universally better; the scientific project compares the group data.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">Visual Story Lab • Grade 5 pilot research website • “Stories Without Words” • Shared online research database</footer>
+</div>
+
+<script>
+/*
+  ONLINE RESEARCH CONFIG
+  1) Create a Google Sheet for the project.
+  2) Deploy the supplied Code.gs as a Google Apps Script web app.
+  3) Paste the deployed /exec URL below.
+*/
+const ONLINE_API_URL = 'https://script.google.com/macros/s/AKfycbz_PUoyW4HbbxM6RlmNqRHtbskeLeQaYApsVVKzOBxPmTsU7gEnJI0sOm3Kx5DNBowp/exec';
+const ONLINE_CONFIGURED = /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec(?:\?.*)?$/.test(ONLINE_API_URL);
+
+let onlineResearchData = [];
+let onlineLoadInProgress = false;
+
+function setCloudStatus(kind, text){
+  const el=document.getElementById('cloudStatus');
+  if(!el) return;
+  el.className='online-status '+kind;
+  el.innerHTML='<span class="dot"></span><span>'+escapeHtml(text)+'</span>';
+}
+function cacheResearchData(data){
+  try{localStorage.setItem('visualStoryLabResearch',JSON.stringify(data));}catch(e){}
+}
+function cacheLatest(entry){
+  try{localStorage.setItem('visualStoryLabLatest',JSON.stringify(entry));}catch(e){}
+}
+function readCachedResearchData(){
+  try{return JSON.parse(localStorage.getItem('visualStoryLabResearch')||'[]')}catch(e){return[]}
+}
+function readCachedLatest(){
+  try{return JSON.parse(localStorage.getItem('visualStoryLabLatest')||'null')}catch(e){return null}
+}
+
+const pilotQuestions = [
+  // TEXT STORY — The Missing Library Book
+  {format:'Text Story',category:'Character',q:'Who borrowed the blue adventure book?',options:['Mira','The librarian','Mira’s art teacher','Mira’s friend'],answer:0},
+  {format:'Text Story',category:'Setting',q:'Where did Mira borrow the book?',options:['From the school library','From a shop','From her home','From the park'],answer:0},
+  {format:'Text Story',category:'Action',q:'What did Mira do with the book after borrowing it?',options:['She put it in her backpack.','She gave it to a friend.','She left it in the kitchen.','She put it on the playground.'],answer:0},
+  {format:'Text Story',category:'Action',q:'Where did Mira go after putting the book in her backpack?',options:['To art class','To the sports hall','To the bus station','To the library again'],answer:0},
+  {format:'Text Story',category:'Emotion',q:'How did Mira feel when she could not find the book?',options:['Worried','Excited','Sleepy','Proud'],answer:0},
+  {format:'Text Story',category:'Setting',q:'Where did Mira remember reading the last two pages?',options:['On a bench near the school garden','In the kitchen','At the bus stop','In the art room'],answer:0},
+  {format:'Text Story',category:'Action',q:'What did Mira do the next morning?',options:['She checked the bench at school.','She bought a new book.','She stayed at home.','She called her friend.'],answer:0},
+  {format:'Text Story',category:'Sequence',q:'What happened after Mira found the book?',options:['She returned it to the library.','She hid it under the bench.','She took it to the art room.','She gave it to her friend.'],answer:0},
+  {format:'Text Story',category:'Emotion',q:'How did Mira feel at the end?',options:['Relieved','Angry','Bored','Scared'],answer:0},
+  {format:'Text Story',category:'Main idea',q:'What is the main idea of the story?',options:['Mira loses a library book, remembers where she read, and finds it.','Mira wins a reading competition.','Mira buys a new adventure book.','Mira teaches an art class.'],answer:0},
+
+  // PICTURE STORY — Rainy-Day Rescue
+  {format:'Picture Story',category:'Character',q:'Who notices a small animal outside?',options:['A child','A teacher','A driver','Two friends'],answer:0,support:'Look carefully at the first two pictures. What person and animal can you see?'},
+  {format:'Picture Story',category:'Setting',q:'Where does the first part of the story happen?',options:['Outside in a green area','Inside a classroom','In a supermarket','On a sports field'],answer:0,support:'Look at the ground, plants, and the open sky.'},
+  {format:'Picture Story',category:'Action',q:'What does the child use when the rain starts?',options:['An umbrella','A bicycle','A ball','A backpack'],answer:0},
+  {format:'Picture Story',category:'Action',q:'What does the child bring for the small animal?',options:['A cardboard box','A book','A blanket from school','A football'],answer:0},
+  {format:'Picture Story',category:'Emotion',q:'What feeling is suggested by the child’s careful actions?',options:['Concern','Anger','Boredom','Surprise'],answer:0},
+  {format:'Picture Story',category:'Setting',q:'Where is the animal safe at the end?',options:['At home','Under a tree','At the library','On a bus'],answer:0},
+  {format:'Picture Story',category:'Sequence',q:'What happens first?',options:['The child notices the animal in the rain.','The child takes the animal home.','The animal eats from a bowl.','The child closes the front door.'],answer:0},
+  {format:'Picture Story',category:'Sequence',q:'What happens immediately before the animal is safe at home?',options:['The child carries the box toward home.','The child reads a book.','The child plays football.','The child leaves the park.'],answer:0},
+  {format:'Picture Story',category:'Emotion',q:'How does the final scene suggest the child feels?',options:['Happy and relieved','Angry and tired','Confused and afraid','Bored and sleepy'],answer:0},
+  {format:'Picture Story',category:'Main idea',q:'What is the best summary of the picture story?',options:['A child helps a small animal in the rain and takes it to safety.','A child loses a book at school.','A child learns to play football.','A child visits a library with a friend.'],answer:0},
+
+  // EMOJI STORY — The Lost Football
+  {format:'Emoji Story',category:'Character',q:'Who is the main character?',options:['A child','A teacher','A librarian','A driver'],answer:0},
+  {format:'Emoji Story',category:'Setting',q:'Where does the story begin?',options:['Near trees in a park','In a classroom','At a supermarket','Inside a bus'],answer:0},
+  {format:'Emoji Story',category:'Action',q:'What happens to the football in the third step?',options:['It rolls into the bushes.','It flies into the sky.','It goes into a classroom.','It disappears at home.'],answer:0},
+  {format:'Emoji Story',category:'Emotion',q:'How does the child feel after losing the football?',options:['Worried','Proud','Excited','Sleepy'],answer:0},
+  {format:'Emoji Story',category:'Action',q:'What do the friends do next?',options:['They search for the football.','They go to the library.','They eat lunch.','They start a lesson.'],answer:0},
+  {format:'Emoji Story',category:'Setting',q:'What place is suggested when the friends use the bench to look around?',options:['The park','The kitchen','The classroom','The bus'],answer:0},
+  {format:'Emoji Story',category:'Sequence',q:'What happens before the football is found?',options:['The friends look around the bushes and bench.','The child goes home.','The child buys a new ball.','The friends start dinner.'],answer:0},
+  {format:'Emoji Story',category:'Action',q:'What happens after the football is found?',options:['The child is happy and they play again.','They throw the ball away.','They leave the park immediately.','They hide the ball.'],answer:0},
+  {format:'Emoji Story',category:'Emotion',q:'Which emoji best matches the child after the football is found?',options:['😊','😟','😡','😴'],answer:0},
+  {format:'Emoji Story',category:'Main idea',q:'What is the main idea of the emoji story?',options:['A child loses a football, friends help, and they find it.','A child forgets a school book.','Friends visit a library.','A child gets caught in the rain.'],answer:0}
+];
+const reflections=[
+  {q:'Which story was easiest to understand?',options:['Text story','Picture story','Emoji story']},
+  {q:'Which story was most difficult to understand?',options:['Text story','Picture story','Emoji story']},
+  {q:'Did pictures help you understand the story?',options:['Yes','A little','No']},
+  {q:'Did emojis help you understand the characters’ feelings?',options:['Yes','A little','No']},
+  {q:'Which format would you like to use for learning stories?',options:['Text','Pictures','Emojis','A combination']}
+];
+let pilotState={index:0,responses:Array(pilotQuestions.length).fill(null),reflections:Array(reflections.length).fill(null),code:'',grade:'5'};
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById('page-'+id); if(el) el.classList.add('active');
+  document.querySelectorAll('.nav-links button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('nav').classList.remove('open');
+  if(id==='research') refreshDashboard();
+  if(id==='results') renderLatestResult();
+}
+
+function startPilot(){
+  const code=document.getElementById('participantCode').value.trim();
+  const grade=document.getElementById('gradeSelect').value;
+  if(!code){alert('Please enter a participant code, for example S05.');return;}
+  pilotState={index:0,responses:Array(pilotQuestions.length).fill(null),reflections:Array(reflections.length).fill(null),code,grade};
+  document.getElementById('pilot-intro').style.display='none';
+  document.getElementById('pilot-question-area').style.display='block';
+  document.getElementById('pilot-results-area').style.display='none';
+  renderPilotQuestion();
+}
+
+function shuffleArray(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function randomizeQuestionOptions(list){
+  list.forEach(q=>{
+    const correctText=q.options[q.answer];
+    q.options=shuffleArray(q.options);
+    q.answer=q.options.indexOf(correctText);
+  });
+}
+randomizeQuestionOptions(pilotQuestions);
+
+function renderStoryContext(format){
+  if(format==='Text Story') return `<div class="question-support"><strong>Story: The Missing Library Book</strong><div class="story-text" style="font-size:14px;line-height:1.65;margin-top:8px"><p>Mira borrowed a blue adventure book from the school library on Monday. She put the book in her backpack and went to art class. After school, she walked home. At home, she opened her backpack, but the book was not there.</p><p>Mira checked her bedroom desk and then looked in the kitchen. She still could not find it. Then she remembered that she had read the last two pages while sitting on a bench near the school garden.</p><p>The next morning, Mira returned to school and checked the bench. The blue book was under it. She took the book back to the library. The librarian thanked her, and Mira felt relieved.</p></div></div>`;
+  if(format==='Picture Story') return `<div class="question-support"><strong>Visual story: Rainy-Day Rescue</strong><div class="picture-grid" style="margin-top:10px">
+    <div class="scene"><svg viewBox="0 0 420 240" role="img" aria-label="A child sees a small cat outside while rain begins."><rect width="420" height="240" fill="#cfe2ff"/><rect y="175" width="420" height="65" fill="#a8c68c"/><g fill="#777"><ellipse cx="100" cy="55" rx="55" ry="27"/><ellipse cx="155" cy="48" rx="70" ry="32"/></g><g stroke="#6da0cf" stroke-width="4"><line x1="60" y1="80" x2="50" y2="120"/><line x1="110" y1="80" x2="100" y2="120"/><line x1="160" y1="80" x2="150" y2="120"/></g><circle cx="290" cy="125" r="25" fill="#f3c8a8"/><rect x="269" y="148" width="42" height="58" rx="14" fill="#e58b7b"/><rect x="278" y="201" width="10" height="28" fill="#303846"/><rect x="302" y="201" width="10" height="28" fill="#303846"/><path d="M322 176 Q355 160 377 182" stroke="#5b5b5b" stroke-width="5" fill="none"/><ellipse cx="120" cy="194" rx="23" ry="13" fill="#c79a78"/><circle cx="105" cy="185" r="9" fill="#c79a78"/><circle cx="101" cy="183" r="2" fill="#222"/><circle cx="110" cy="183" r="2" fill="#222"/></svg></div>
+    <div class="scene"><svg viewBox="0 0 420 240" role="img" aria-label="A child opens an umbrella and approaches a small cat."><rect width="420" height="240" fill="#d7e7fb"/><rect y="175" width="420" height="65" fill="#a8c68c"/><circle cx="95" cy="175" r="55" fill="#7bbf7a"/><path d="M50 148 Q95 102 140 148" fill="#95c982"/><circle cx="285" cy="125" r="25" fill="#f3c8a8"/><rect x="264" y="148" width="42" height="58" rx="14" fill="#e58b7b"/><rect x="271" y="201" width="10" height="28" fill="#303846"/><rect x="295" y="201" width="10" height="28" fill="#303846"/><path d="M260 121 Q285 76 320 121 Z" fill="#6a73c9"/><line x1="290" y1="121" x2="290" y2="176" stroke="#4b5563" stroke-width="4"/><ellipse cx="120" cy="194" rx="23" ry="13" fill="#c79a78"/><circle cx="105" cy="185" r="9" fill="#c79a78"/><circle cx="101" cy="183" r="2" fill="#222"/><circle cx="110" cy="183" r="2" fill="#222"/></svg></div>
+    <div class="scene"><svg viewBox="0 0 420 240" role="img" aria-label="The child brings a cardboard box toward the cat."><rect width="420" height="240" fill="#d7e7fb"/><rect y="175" width="420" height="65" fill="#a8c68c"/><circle cx="95" cy="175" r="55" fill="#7bbf7a"/><circle cx="285" cy="115" r="25" fill="#f3c8a8"/><rect x="264" y="138" width="42" height="58" rx="14" fill="#e58b7b"/><rect x="272" y="191" width="10" height="28" fill="#303846"/><rect x="296" y="191" width="10" height="28" fill="#303846"/><rect x="140" y="164" width="85" height="52" fill="#c89c67" stroke="#915f2e" stroke-width="4"/><ellipse cx="120" cy="194" rx="23" ry="13" fill="#c79a78"/><circle cx="105" cy="185" r="9" fill="#c79a78"/><circle cx="101" cy="183" r="2" fill="#222"/><circle cx="110" cy="183" r="2" fill="#222"/></svg></div>
+    <div class="scene"><svg viewBox="0 0 420 240" role="img" aria-label="The cat is safe inside the box under the umbrella."><rect width="420" height="240" fill="#d7e7fb"/><rect y="175" width="420" height="65" fill="#a8c68c"/><path d="M235 120 Q280 72 325 120 Z" fill="#6a73c9"/><line x1="280" y1="120" x2="280" y2="184" stroke="#4b5563" stroke-width="4"/><rect x="155" y="166" width="150" height="68" fill="#c89c67" stroke="#915f2e" stroke-width="4"/><ellipse cx="230" cy="186" rx="27" ry="16" fill="#c79a78"/><circle cx="214" cy="178" r="9" fill="#c79a78"/><circle cx="211" cy="176" r="2" fill="#222"/><circle cx="220" cy="176" r="2" fill="#222"/><circle cx="281" cy="177" r="7" fill="#fff"/></svg></div>
+    <div class="scene"><svg viewBox="0 0 420 240" role="img" aria-label="The child carries the safe cat home under an umbrella."><rect width="420" height="240" fill="#d7e7fb"/><rect y="175" width="420" height="65" fill="#b9cfaf"/><rect x="70" y="118" width="95" height="80" fill="#e7c89a" stroke="#9d7a48" stroke-width="4"/><polygon points="58,118 118,72 178,118" fill="#bb6f6f"/><rect x="108" y="153" width="22" height="45" fill="#896d57"/><circle cx="250" cy="126" r="25" fill="#f3c8a8"/><rect x="229" y="149" width="42" height="56" rx="14" fill="#e58b7b"/><rect x="236" y="201" width="10" height="28" fill="#303846"/><rect x="259" y="201" width="10" height="28" fill="#303846"/><path d="M224 122 Q249 77 284 122 Z" fill="#6a73c9"/><line x1="254" y1="122" x2="254" y2="176" stroke="#4b5563" stroke-width="4"/><rect x="210" y="169" width="50" height="38" fill="#c89c67" stroke="#915f2e" stroke-width="4"/><ellipse cx="236" cy="178" rx="14" ry="9" fill="#c79a78"/></svg></div>
+    <div class="scene"><svg viewBox="0 0 420 240" role="img" aria-label="At home, the dry cat eats from a bowl and the child smiles."><rect width="420" height="240" fill="#f7e9d3"/><rect y="200" width="420" height="40" fill="#d9c1a4"/><rect x="50" y="42" width="95" height="88" fill="#d7e7fb" stroke="#8da4bf" stroke-width="4"/><rect x="275" y="103" width="60" height="30" rx="10" fill="#f2a55e"/><circle cx="175" cy="115" r="25" fill="#f3c8a8"/><rect x="154" y="138" width="42" height="61" rx="14" fill="#e58b7b"/><ellipse cx="270" cy="181" rx="31" ry="17" fill="#c79a78"/><circle cx="247" cy="172" r="10" fill="#c79a78"/><circle cx="244" cy="170" r="2" fill="#222"/><circle cx="251" cy="170" r="2" fill="#222"/><ellipse cx="272" cy="203" rx="24" ry="7" fill="#8b6f58"/></svg></div>
+    </div></div>`;
+  if(format==='Emoji Story') return `<div class="question-support"><strong>Visual story: The Lost Football</strong><div class="emoji-story" style="margin-top:10px">${['🧒 ⚽ 🌳','🧒 ⚽ 🏃','⚽ ➡️ 🌿','🧒 😟','🧑‍🤝‍🧑 🔎 🌿','👬 🪑 👀','⚽ ✅','🧒 😊','👬 ⚽','🌳 🌇 👋'].map((x,i)=>`<div class="emoji-step"><div class="emoji-num">${i+1}</div><div class="emoji-line" style="font-size:36px;min-height:64px">${x}</div></div>`).join('')}</div></div>`;
+  return '';
+}
+
+function renderPilotQuestion(){
+  const area=document.getElementById('pilot-question-area');
+  const totalQuestions=pilotQuestions.length+reflections.length;
+  const idx=pilotState.index;
+  const progress=Math.round((idx/totalQuestions)*100);
+  if(idx<pilotQuestions.length){
+    const item=pilotQuestions[idx];
+    const selected=pilotState.responses[idx];
+    const section=idx<10?'Part A — Text Story':idx<20?'Part B — Picture Story':'Part C — Emoji Story';
+    const html=`<div class="progress-wrap"><div class="progress-meta"><span>${section}</span><span>Question ${idx+1} of ${totalQuestions}</span></div><div class="progress"><span style="width:${progress}%"></span></div></div>
+      <div class="question-card"><div class="q-kicker">${item.format} • ${item.category}</div>${renderStoryContext(item.format)}<h3>${item.q}</h3>${item.support?`<div class="question-support">${item.support}</div>`:''}<div class="options">${item.options.map((op,i)=>`<button class="option ${selected===i?'selected':''}" onclick="choosePilot(${idx},${i})"><span class="choice-dot">${String.fromCharCode(65+i)}</span><span>${op}</span></button>`).join('')}</div><div class="q-actions"><button class="ghost" onclick="pilotPrev()" ${idx===0?'disabled':''}>Back</button><div class="right"><button class="primary" onclick="pilotNext()">${idx===pilotQuestions.length-1?'Continue to reflection':'Next'}</button></div></div></div>`;
+    area.innerHTML=html;
+  } else {
+    const rIdx=idx-pilotQuestions.length;
+    const r=reflections[rIdx]; const selected=pilotState.reflections[rIdx];
+    area.innerHTML=`<div class="progress-wrap"><div class="progress-meta"><span>Part D — Reflection</span><span>Question ${idx+1} of ${totalQuestions}</span></div><div class="progress"><span style="width:${progress}%"></span></div></div><div class="question-card"><div class="q-kicker">Reflection</div><h3>${r.q}</h3><div class="options">${r.options.map((op,i)=>`<button class="option ${selected===i?'selected':''}" onclick="chooseReflection(${rIdx},${i})"><span class="choice-dot">${String.fromCharCode(65+i)}</span><span>${op}</span></button>`).join('')}</div><div class="q-actions"><button class="ghost" onclick="pilotPrev()">Back</button><div class="right"><button class="primary" onclick="pilotNext()">${rIdx===reflections.length-1?'Finish Pilot':'Next'}</button></div></div></div>`;
+  }
+  window.scrollTo({top:180,behavior:'smooth'});
+}
+function choosePilot(i,v){pilotState.responses[i]=v;renderPilotQuestion()}
+function chooseReflection(i,v){pilotState.reflections[i]=v;renderPilotQuestion()}
+function pilotPrev(){if(pilotState.index>0){pilotState.index--;renderPilotQuestion()}}
+function pilotNext(){
+  const idx=pilotState.index;
+  if(idx<pilotQuestions.length && pilotState.responses[idx]===null){alert('Please choose an answer before continuing.');return;}
+  if(idx>=pilotQuestions.length && pilotState.reflections[idx-pilotQuestions.length]===null){alert('Please choose an answer before continuing.');return;}
+  if(idx<pilotQuestions.length+reflections.length-1){pilotState.index++;renderPilotQuestion();}
+  else finishPilot();
+}
+function finishPilot(){
+  const textScore=scoreRange(0,10),pictureScore=scoreRange(10,20),emojiScore=scoreRange(20,30),total=textScore+pictureScore+emojiScore;
+  const entry={
+    id:(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+'-'+Math.random().toString(16).slice(2),
+    code:pilotState.code,
+    grade:pilotState.grade,
+    date:new Date().toISOString(),
+    textScore,pictureScore,emojiScore,total,
+    percent:Math.round((total/30)*100),
+    responses:[...pilotState.responses],
+    reflections:[...pilotState.reflections]
+  };
+
+  // Local cache is only a device-side convenience; the shared record is sent below.
+  const cached=getResearchData();
+  const merged=cached.filter(x=>x.id!==entry.id);
+  merged.push(entry);
+  cacheResearchData(merged);
+  cacheLatest(entry);
+  onlineResearchData=merged;
+
+  document.getElementById('pilot-question-area').style.display='none';
+  const rArea=document.getElementById('pilot-results-area');rArea.style.display='block';
+  rArea.innerHTML=`<div class="result-hero"><div class="score-card"><div><div class="big-score">${total}/30</div><div class="score-caption">Comprehension score • ${entry.percent}%</div></div></div><div class="card"><span class="tag">Completed</span><h3 style="margin-top:12px">Thank you, ${escapeHtml(entry.code)}!</h3><div class="score-grid"><div class="score-mini"><strong>${textScore}/10</strong><span>Text story</span></div><div class="score-mini"><strong>${pictureScore}/10</strong><span>Picture story</span></div><div class="score-mini"><strong>${emojiScore}/10</strong><span>Emoji story</span></div></div><div id="submissionStatus" class="notice" style="margin-top:16px">Sending your result to the shared research database…</div><div class="hero-actions"><button class="primary" onclick="showPage('results')">View My Result</button><button class="ghost" onclick="showPage('research')">Research Dashboard</button></div></div></div><div class="card" style="margin-top:18px"><h3>Reflection saved</h3><p class="muted">Your five reflection choices are included with the pilot entry. Only the participant code is used for the research record.</p></div>`;
+
+  submitEntryOnline(entry);
+  window.scrollTo({top:160,behavior:'smooth'});
+}
+function scoreRange(a,b){return pilotState.responses.slice(a,b).reduce((s,v,i)=>s+(v===pilotQuestions[a+i].answer?1:0),0)}
+function getResearchData(){return onlineResearchData.length?onlineResearchData:readCachedResearchData()}
+function escapeHtml(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+
+function submitEntryOnline(entry){
+  const status=document.getElementById('submissionStatus');
+  if(!ONLINE_CONFIGURED){
+    if(status) status.textContent='Online database is not configured yet. The result is kept in this browser cache.';
+    return;
+  }
+  try{
+    fetch(ONLINE_API_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'append',entry})})
+      .then(()=>{
+        if(status) status.textContent='Result sent to the shared online database. The teacher dashboard can load it from the common spreadsheet.';
+      })
+      .catch(()=>{
+        if(status) status.textContent='The online submission could not be confirmed. Please ask the teacher to refresh the dashboard and check the shared spreadsheet.';
+      });
+  }catch(e){
+    if(status) status.textContent='The online submission could not be started. The result remains in this browser cache.';
+  }
+}
+
+function loadResearchDataOnline(){
+  return new Promise((resolve,reject)=>{
+    if(!ONLINE_CONFIGURED){reject(new Error('Online database URL is not configured.'));return;}
+    const cb='vsl_cb_'+Date.now()+'_'+Math.random().toString(16).slice(2);
+    const script=document.createElement('script');
+    const timeout=setTimeout(()=>{
+      cleanup();
+      reject(new Error('Online database request timed out.'));
+    },12000);
+    function cleanup(){
+      clearTimeout(timeout);
+      delete window[cb];
+      if(script.parentNode) script.parentNode.removeChild(script);
+    }
+    window[cb]=payload=>{
+      cleanup();
+      if(payload&&payload.ok){resolve(Array.isArray(payload.data)?payload.data:[]);}
+      else reject(new Error(payload&&payload.error?payload.error:'Online database returned an error.'));
+    };
+    script.onerror=()=>{
+      cleanup();
+      reject(new Error('Could not reach the Google Apps Script web app.'));
+    };
+    script.src=ONLINE_API_URL+(ONLINE_API_URL.includes('?')?'&':'?')+'action=read&callback='+encodeURIComponent(cb)+'&_='+Date.now();
+    document.head.appendChild(script);
+  });
+}
+
+
+function renderLatestResult(){
+  const wrap=document.getElementById('latestResult');
+  const e=readCachedLatest();
+  if(!e){wrap.innerHTML='<div class="card"><h3>No pilot result yet</h3><p class="muted">Complete the pilot first. Your latest result will appear here on this device.</p><button class="primary" onclick="showPage(\'pilot\')">Take the Pilot</button></div>';return;}
+  wrap.innerHTML=`<div class="score-card"><div><div class="big-score">${e.total}/30</div><div class="score-caption">${e.percent}% overall</div></div></div><div class="card"><span class="tag">Participant ${escapeHtml(e.code)}</span><h3 style="margin-top:12px">Format scores</h3><div class="score-grid"><div class="score-mini"><strong>${e.textScore}</strong><span>Text / 10</span></div><div class="score-mini"><strong>${e.pictureScore}</strong><span>Pictures / 10</span></div><div class="score-mini"><strong>${e.emojiScore}</strong><span>Emojis / 10</span></div></div><div class="callout"><strong>Remember:</strong> this is one pilot result. The scientific conclusion should be based on the group data in the shared researcher dashboard.</div></div>`;
+}
+
+function renderDashboardFromData(data){
+  onlineResearchData=Array.isArray(data)?data:[];
+  if(onlineResearchData.length) cacheResearchData(onlineResearchData);
+  const rows=onlineResearchData.length?onlineResearchData:readCachedResearchData();
+  const n=rows.length;
+  const avgTotal=n?rows.reduce((s,e)=>s+Number(e.total||0),0)/n:0;
+  const avgPct=n?rows.reduce((s,e)=>s+Number(e.percent||0),0)/n:0;
+  const avgText=n?rows.reduce((s,e)=>s+Number(e.textScore||0),0)/n:0;
+  const avgPic=n?rows.reduce((s,e)=>s+Number(e.pictureScore||0),0)/n:0;
+  const avgEmoji=n?rows.reduce((s,e)=>s+Number(e.emojiScore||0),0)/n:0;
+
+  const cats={Character:[],Setting:[],Action:[],Emotion:[],Sequence:[],"Main idea":[]};
+  const qStats=pilotQuestions.map((q,i)=>({q,index:i,correct:0,total:0}));
+  rows.forEach(e=>{
+    (Array.isArray(e.responses)?e.responses:[]).forEach((v,i)=>{
+      if(v!==null && v!==undefined && pilotQuestions[i]){
+        const correct=Number(v)===Number(pilotQuestions[i].answer)?1:0;
+        if(cats[pilotQuestions[i].category]) cats[pilotQuestions[i].category].push(correct);
+        qStats[i].total++; qStats[i].correct+=correct;
+      }
+    });
+  });
+
+  const reflectionStats=reflections.map((r,i)=>{
+    const counts=r.options.map(()=>0);
+    rows.forEach(e=>{
+      const v=Array.isArray(e.reflections)?e.reflections[i]:null;
+      if(v!==null&&v!==undefined&&counts[v]!==undefined) counts[v]++;
+    });
+    return {q:r.q,options:r.options,counts};
+  });
+
+  document.getElementById('dashboardStats').innerHTML=`<div class="dash-stat"><div class="num">${n}</div><div class="lab">participants</div></div><div class="dash-stat"><div class="num">${n?avgTotal.toFixed(1):'—'}/30</div><div class="lab">average comprehension score</div></div><div class="dash-stat"><div class="num">${n?avgPct.toFixed(1):'—'}%</div><div class="lab">average percentage</div></div>`;
+
+  const formatValues=[['Text',avgText/10*100],['Pictures',avgPic/10*100],['Emojis',avgEmoji/10*100]];
+  document.getElementById('formatChart').innerHTML=n?formatValues.map(([lab,val])=>`<div class="bar-row"><span>${lab}</span><div class="bar-bg"><div class="bar-fill" style="width:${Math.min(100,Math.max(0,val))}%"></div></div><strong>${val.toFixed(1)}%</strong></div>`).join(''):'<p class="muted">No pilot data yet.</p>';
+
+  const catRows=Object.entries(cats).map(([k,a])=>[k,a.length?a.reduce((s,v)=>s+v,0)/a.length*100:0]);
+  document.getElementById('categoryChart').innerHTML=n?catRows.map(([lab,val])=>`<div class="bar-row"><span>${lab}</span><div class="bar-bg"><div class="bar-fill" style="width:${Math.min(100,Math.max(0,val))}%"></div></div><strong>${val.toFixed(1)}%</strong></div>`).join(''):'<p class="muted">No pilot data yet.</p>';
+
+  document.getElementById('questionChart').innerHTML=n?qStats.map((s,i)=>{
+    const val=s.total?s.correct/s.total*100:0;
+    return `<div class="bar-row" title="${escapeHtml(s.q.q)}"><span>Q${i+1} • ${escapeHtml(s.q.category)}</span><div class="bar-bg"><div class="bar-fill" style="width:${val}%"></div></div><strong>${val.toFixed(1)}%</strong></div>`;
+  }).join(''):'<p class="muted">No pilot data yet.</p>';
+
+  document.getElementById('reflectionChart').innerHTML=n?reflectionStats.map((r,ri)=>{
+    const total=r.counts.reduce((a,b)=>a+b,0);
+    return `<div class="quiz-item"><p>${ri+1}. ${escapeHtml(r.q)}</p>${r.options.map((op,oi)=>{
+      const pct=total?r.counts[oi]/total*100:0;
+      return `<div class="bar-row" style="grid-template-columns:120px 1fr 55px;margin-top:6px"><span>${escapeHtml(op)}</span><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div><strong>${r.counts[oi]}</strong></div>`;
+    }).join('')}</div>`;
+  }).join(''):'<p class="muted">No reflection data yet.</p>';
+
+  const tbody=document.querySelector('#resultsTable tbody');
+  tbody.innerHTML=rows.length?rows.slice().reverse().map(e=>`<tr><td>${escapeHtml(e.code)}</td><td>${escapeHtml(e.grade??'')}</td><td>${new Date(e.date).toLocaleString()}</td><td>${Number(e.textScore||0)}</td><td>${Number(e.pictureScore||0)}</td><td>${Number(e.emojiScore||0)}</td><td>${Number(e.total||0)}</td><td>${Number(e.percent||0)}%</td></tr>`).join(''):'<tr><td colspan="8" class="muted">No entries yet.</td></tr>';
+}
+
+async function refreshDashboard(){
+  if(onlineLoadInProgress) return;
+  onlineLoadInProgress=true;
+  setCloudStatus('busy','Loading shared research data…');
+  try{
+    const data=await loadResearchDataOnline();
+    renderDashboardFromData(data);
+    setCloudStatus('ok',`Online • ${data.length} participant${data.length===1?'':'s'}`);
+  }catch(err){
+    const local=readCachedResearchData();
+    renderDashboardFromData(local);
+    setCloudStatus('off',ONLINE_CONFIGURED?'Offline/unverified • showing local cache':'Setup required • add the Apps Script URL');
+  }finally{
+    onlineLoadInProgress=false;
+  }
+}
+
+function exportCSV(){
+  const data=onlineResearchData.length?onlineResearchData:readCachedResearchData();
+  if(!data.length){alert('No pilot data to export.');return;}
+  const header=['ID','Code','Grade','Date','TextScore','PictureScore','EmojiScore','Total','Percent',...reflections.map((r,i)=>'Reflection'+(i+1))];
+  const rows=data.map(e=>[e.id,e.code,e.grade,e.date,e.textScore,e.pictureScore,e.emojiScore,e.total,e.percent,...e.reflections.map((v,i)=>v===null||v===undefined?'':(reflections[i].options[v]||''))]);
+  const csv=[header,...rows].map(row=>row.map(x=>`"${String(x??'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='visual_story_lab_pilot_results.csv';a.click();URL.revokeObjectURL(url);
+}
+function clearLocalCache(){
+  if(confirm('Clear only this browser cache? The shared Google Sheet will not be changed.')){
+    localStorage.removeItem('visualStoryLabResearch');
+    localStorage.removeItem('visualStoryLabLatest');
+    onlineResearchData=[];
+    refreshDashboard();
+    renderLatestResult();
+  }
+}
+
+
+const decoderQuestions=[
+ {q:'🌧️ → 🧒 → ☔ → 🐱',options:['A child notices a cat in the rain.','A child plays football with a friend.','A child cooks dinner.'],answer:0},
+ {q:'⚽ → 🌿 → 😟',options:['A football is lost in the bushes and the child is worried.','A football is put in a bag and the child is happy.','A child buys a new football.'],answer:0},
+ {q:'🧑‍🤝‍🧑 → 🔎 → ⚽ ✅',options:['Friends search and find the football.','Friends hide the football.','Friends go to sleep.'],answer:0},
+ {q:'🏠 → 🐱 → 🍲 → 😊',options:['At home the cat is safe and eats.','The cat goes to the park alone.','The cat gets lost again.'],answer:0},
+ {q:'👬 → 🪑 → 👀 → ⚽',options:['Friends look around a bench and notice the football.','Friends leave the park without looking.','Friends read a book at the bench.'],answer:0}
+];
+randomizeQuestionOptions(decoderQuestions);
+function renderDecoder(){document.getElementById('decoderQuiz').innerHTML=decoderQuestions.map((d,i)=>`<div class="quiz-item"><p>${i+1}. ${d.q}</p><div class="options">${d.options.map((op,j)=>`<button class="option" data-decoder="${i}" data-val="${j}" onclick="selectDecoder(this)"><span class="choice-dot">${String.fromCharCode(65+j)}</span>${op}</button>`).join('')}</div></div>`).join('')}
+function selectDecoder(btn){document.querySelectorAll(`[data-decoder="${btn.dataset.decoder}"]`).forEach(b=>b.classList.remove('selected'));btn.classList.add('selected')}
+function checkDecoder(){let score=0;decoderQuestions.forEach((d,i)=>{const b=document.querySelector(`[data-decoder="${i}"].selected`);if(b&&Number(b.dataset.val)===d.answer){score++}});document.getElementById('decoderResult').textContent=`Score: ${score}/${decoderQuestions.length}`;}
+
+function buildStory(){
+  const c=document.getElementById('cCharacter').value,p=document.getElementById('cPlace').value,pr=document.getElementById('cProblem').value,e=document.getElementById('cEnding').value;
+  document.getElementById('storyOutput').innerHTML=`<strong>${c}</strong> was ${p}. One day, the character <strong>${pr}</strong>. At first, the problem seemed difficult. After thinking carefully and noticing the important clues, the character decided to ${e}. In the end, the experience became a story worth remembering.`;
+}
+let orderState=[];
+function initOrderGame(){
+  const cards=[{id:1,t:'Find a problem'},{id:2,t:'Feel worried'},{id:3,t:'Ask for help'},{id:4,t:'Solve the problem'}];
+  const shuffled=[...cards].sort(()=>Math.random()-.5);orderState=[];document.getElementById('orderOptions').innerHTML=shuffled.map(c=>`<button class="drag-card" data-id="${c.id}" onclick="chooseOrder(this)">${c.t}</button>`).join('');
+}
+function chooseOrder(btn){btn.classList.toggle('selected');if(btn.classList.contains('selected'))orderState.push(Number(btn.dataset.id));else orderState=orderState.filter(x=>x!==Number(btn.dataset.id));}
+function checkOrderGame(){const good=[1,2,3,4].every((v,i)=>orderState[i]===v)&&orderState.length===4;document.getElementById('orderResult').textContent=good?'Correct order!':'Try again: build the sequence from problem to solution.'}
+function checkEmotionGame(){let s=0;document.querySelectorAll('[data-game]').forEach(box=>{const b=box.querySelector('button.selected');const game=box.dataset.game;if(b&&((game==='emotion1'&&b.dataset.value==='worried')||(game==='emotion2'&&b.dataset.value==='relieved')))s++});document.getElementById('emotionResult').textContent=`Score: ${s}/2`;}
+document.querySelectorAll('[data-game] button').forEach(b=>b.addEventListener('click',()=>{const parent=b.parentElement;parent.querySelectorAll('button').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')}));
+
+renderDecoder();initOrderGame();renderLatestResult();refreshDashboard();showPage('home');
+</script>
+</body>
+</html>
